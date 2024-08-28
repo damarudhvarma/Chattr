@@ -98,7 +98,9 @@ const Auth = () => {
             </Tabs>
           </div>
         </div>
-        <div className="flex justify-center items-center "></div>
+        <div className=" hidden xl:flex justify-center items-center ">
+          <img className="h-[600px]" src={Background} alt="" />
+        </div>
       </div>
     </div>
   );
