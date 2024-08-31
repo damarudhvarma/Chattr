@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { hash ,genSalt} from 'bcrypt';
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({

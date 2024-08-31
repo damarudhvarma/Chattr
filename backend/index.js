@@ -16,6 +16,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+// console.log(process.env.ORIGIN)
 
 
 
@@ -25,9 +26,7 @@ const databaseURI= process.env.DATABASE_URI;
 
 app.use('/api/auth',authRoutes);
 
-app.get('/',(req,res)=>{
-    res.send("hello");
-})
+
 mongoose.set('strictQuery', true)
 mongoose.connect(databaseURI).then(()=>{
     console.log("connected to database");
