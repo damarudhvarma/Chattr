@@ -70,3 +70,29 @@ res.status(200).json({user:{
      return res.status(500).json({message:err.message})
 }
 }
+
+
+export const getUserInfo = async (req,res,next)=>{
+  try{
+    const userData = await User.findById(req.userId)
+    if(!userData){
+      return res.status(404).send("User with the given id not found.")
+    }
+      
+  return res.status(200).json(
+    {
+  id:userData.id,
+  email:userData.email,
+  ProfileSetup:userData.ProfileSetup,
+  firstname:userData.firstname,
+  lastname:userData.lastname,
+  color:userData.color,
+})
+
+  }
+  catch(err){
+      console.log(err);
+     return res.status(500).json({message:err.message})
+}
+}
+

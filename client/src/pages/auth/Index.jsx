@@ -9,12 +9,14 @@ import { toast } from "sonner"
 import { apiClinet } from "@/lib/api-clinet";
 import { Login, Sign_up } from "@/utils/constants.js";
 import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/stores";
 
 
 const Auth = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [confirmpassword, setconfirmpassword] = useState("");
+  const {setUserInfo} = useAppStore();
 
   const navigate = useNavigate();
 
@@ -51,29 +53,35 @@ const Auth = () => {
     return true;
   }
 
-  const handleLogin= async ()=>{
-    if(validateLogin()){
-      const response = await apiClinet.post(Login,{email,password},{withCredentials:true})
-      console.log({response});
-
-      if(response.data.user.id){
-        if(response.data.ProfileSetup){
-          navigate("/chat");
+  const handleLogin = async () => {
+    if (validateLogin()) {
+      try {
+        const response = await apiClinet.post(Login, { email, password }, { withCredentials: true });
+        console.log("Login response:", response);
+  
+        if (response.data.user.id) {
+          setUserInfo(response.data.user);
+          console.log("User info set:", response.data.user);
+          User
+  
+          if (response.data.ProfileSetup) {
+            navigate("/chat");
+          } else {
+            navigate("/profile");
+          }
         }
-        else{
-          navigate("/profile");
-        }
+      } catch (error) {
+        console.error("Login error:", error);
       }
     }
-   
-
-  }
+  };
  const handleSignup = async ()=>{
   if(validateSignup()){
     await console.log("this is the url",Sign_up);
     const response = await apiClinet.post(Sign_up,{email,password},{withCredentials:true})
     console.log({response});
     if( response.status===201){
+      setUserInfo(response.data.user)
       navigate("/profile")
     }
 
