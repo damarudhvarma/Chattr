@@ -10,7 +10,6 @@ export const verifyToken =(request,response,next)=>{
     }
     jwt.verify(token,process.env.JWT_KEY,async(err,payload)=>{
         if(err) return response.status(403).send("token is not valid!"); 
-        console.log('Payload:', payload);
         request.userId = payload.userId;
         next();
         
