@@ -1,5 +1,5 @@
 import { useAppStore } from '@/stores'
-import {React,useState} from 'react'
+import {React,useState,useEffect, useRef} from 'react'
 import { useNavigate } from 'react-router-dom'
 import {IoArrowBack} from  'react-icons/io5'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
@@ -7,6 +7,9 @@ import { colors, getColor } from '@/lib/utils'
 import {FaPlus,FaTrash} from  'react-icons/fa'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { apiClinet } from '@/lib/api-clinet'
+import { ADD_PROFILE_IMAGE_ROUTE, Auth_Route, HOST, REMOVE_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE } from '@/utils/constants'
 
 
 
@@ -18,11 +21,96 @@ const Profile = () => {
   const [Image, setImage] = useState(null)
   const [Hover, setHover] = useState(false)
   const [SelectedColor, setSelectedColor] = useState(0)
+  const fileInputRef = useRef();
+
+  useEffect(() => {
+    if(userInfo.ProfileSetup){
+      setfirstName(userInfo.firstName)
+      setlastName(userInfo.lastName)
+      setSelectedColor(userInfo.color)
+    }
+
+    if (userInfo.image) {
+      setImage(`${HOST}/${userInfo.image}`);
+    }
+    console.log(userInfo.image)
+  }, [userInfo])
+  
+const handleNavigate= ()=>{
+  if(userInfo.ProfileSetup){
+    navigate("/chat")
+  }else{
+    toast.error("please setup profile.")
+  }
+}
+  const validateProfile = () =>{
+    if(!firstName){
+      toast.error("first name is  required")
+      return false;
+    }
+
+    if(!lastName){
+      toast.error("last name is  required");
+      return false;
+    }
+    return true;
+  }
   
   const saveChanges = async ()=>{
-
+  if(validateProfile()){
+    try{
+   const res =  await apiClinet.post(
+    UPDATE_PROFILE_ROUTE,{firstName,lastName,color:SelectedColor},
+    {withCredentials: true}
+    
+   )
+   
+   if(res.status===200){
+    setUserInfo({...res.data });
+    toast.success("profile updated successfully");
+    navigate("/chat");
+  }
+    }
+    catch(err){
+      console.log(err)
+    }
+  }
   }
 
+  const handleFileInputClick = ()=>{
+    fileInputRef.current.click()
+  }
+
+  const handleImageChange= async (event)=>{
+    const file = event.target.files[0];
+    console.log({file})
+    if(file){
+      const formData = new  FormData();
+      formData.append("profile-image",file);
+       const res = await apiClinet.post(ADD_PROFILE_IMAGE_ROUTE,formData,{withCredentials: true});
+       if(res.status===200 && res.data.image){
+        setUserInfo({...userInfo,image:res.data.image});
+        toast.success("profile image updated successfully");
+       }
+       
+    }
+    
+
+  }
+  const handleImageDelete = async ()=>{
+    try{
+      const res= await apiClinet.delete(REMOVE_PROFILE_IMAGE_ROUTE,{withCredentials:true })
+      if(res.status===200){
+        setUserInfo({...userInfo,image:null});
+        toast.success("Image removed sucessfully.")
+        setImage(null)
+      }
+    }
+    catch(err){
+      console.log(err)
+    }
+
+  }
 
 
 
@@ -32,7 +120,7 @@ const Profile = () => {
   return (
     <div className='bg-[#1b1c24] h-[100vh] flex items-center justify-center flex-col gap-10  w-full'>
       <div className="flex flex-col gap-10 w-[80vw] md:w-max ">
-        <div>
+        <div onClick={handleNavigate}>
           <IoArrowBack className ="text-3xl lg:text-4xl text-white/90 cursor-pointer "/>
         </div>
         <div className='grid grid-col-2 w-full gap-4 md:flex md:gap-7'>
@@ -51,14 +139,14 @@ const Profile = () => {
               </Avatar>
               {
                 Hover && (
-                  <div className=' absolute inset-0 flex items-center justify-center bg-black/90 ring-fuchsia-50  rounded-full'>
+                  <div className=' absolute inset-0 flex items-center justify-center bg-black/90 ring-fuchsia-50  rounded-full' onClick={Image ?handleImageDelete: handleFileInputClick}>
                  {
-                  Image ? <FaTrash className='text-white text-3xl cursor-pointer '/> :<FaPlus className='text-white text-3xl cursor-pointer ' />
+                  Image ? <FaTrash className='text-white text-3xl cursor-pointer '/> :<FaPlus className='text-white text-3xl cursor-pointer ' />   
                     }
                      </div>
                 )
               }
-             {/* <input type="text" /> */}
+             <input type="file" ref={fileInputRef} className='hidden' onChange={handleImageChange} name='profile-image' accept='.png, .jpeg, .svg, .jpeg, .webp'/>
           </div>
           <div className="flex min-w-34 md:min-w-64 flex-col gap-5 text-white items-center justify-center">
             <div className="w-full ">

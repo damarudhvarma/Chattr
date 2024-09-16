@@ -13,12 +13,12 @@ const userSchema = new mongoose.Schema({
         required:[true,"password is required"],
 
     },
-    fristname:{
+    firstName:{
         type :String,
         required:false,
 
     },
-    lastname:{
+    lastName:{
         type :String,
         required:false,
 

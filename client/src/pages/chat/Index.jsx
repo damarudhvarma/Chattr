@@ -7,7 +7,7 @@ const chat = () => {
   const {userInfo}= useAppStore();
   const naviagte = useNavigate();
   useEffect(() => {
-    console.log(userInfo.ProfileSetup)
+    
     if(!userInfo.ProfileSetup){
       toast("please set up your profile")
       naviagte('/profile')
