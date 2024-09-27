@@ -53,7 +53,7 @@ const ProfileInfo = () => {
       console.log(error);
     }
   };
-  console.log("from chat",userInfo);
+
 
   
 
