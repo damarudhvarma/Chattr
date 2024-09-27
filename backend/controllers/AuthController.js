@@ -42,6 +42,8 @@ export  const login = async (req,res,next)=>{
           res.send("Email && Password is requrided" )
       }
 const user = await User.findOne({email});
+
+
 if(!user){
   return res.status(404).json({message:"User not found" })
 }

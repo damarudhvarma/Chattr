@@ -57,11 +57,10 @@ const Auth = () => {
     if (validateLogin()) {
       try {
         const response = await apiClinet.post(Login, { email, password }, { withCredentials: true });
-        console.log("Login response:", response);
+        
   
         if (response.data.user.id) {
           setUserInfo(response.data.user);
-          console.log("User info set:", response.data.user);
           
   
           if (response.data.ProfileSetup) {
@@ -77,9 +76,9 @@ const Auth = () => {
   };
  const handleSignup = async ()=>{
   if(validateSignup()){
-    await console.log("this is the url",Sign_up);
+    
     const response = await apiClinet.post(Sign_up,{email,password},{withCredentials:true})
-    console.log({response});
+    
     if( response.status===201){
       setUserInfo(response.data.user)
       navigate("/profile")
