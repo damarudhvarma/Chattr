@@ -13,7 +13,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { IoPowerSharp } from "react-icons/io5";
 import { apiClinet } from "@/lib/api-clinet";
-import { GET_USER_INFO } from "@/utils/constants";
+import { GET_USER_INFO , } from "@/utils/constants";
 const ProfileInfo = () => {
   const { userInfo, setUserInfo } = useAppStore();
   const navigate = useNavigate();

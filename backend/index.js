@@ -4,6 +4,7 @@ import dotenv from  "dotenv";
 import cookieParser from "cookie-parser";
 import mongoose from  "mongoose";
 import authRoutes from "./routes/AuthRoutes.js";
+import contactsRoutes from "./routes/ContactRoutes.js";
 
 
 
@@ -25,6 +26,7 @@ const databaseURI= process.env.DATABASE_URI;
 
 
 app.use('/api/auth',authRoutes);
+app.use('/api/contacts',contactsRoutes);
 
 
 mongoose.set('strictQuery', true)
