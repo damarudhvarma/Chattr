@@ -2,10 +2,10 @@ import express from "express";
 import cors from "cors";
 import dotenv from  "dotenv";   
 import cookieParser from "cookie-parser";
-import mongoose from  "mongoose";
+import mongoose, { set } from  "mongoose";
 import authRoutes from "./routes/AuthRoutes.js";
 import contactsRoutes from "./routes/ContactRoutes.js";
-
+import setupSocket from "./socket.js";
 
 
 dotenv.config();
@@ -41,3 +41,5 @@ const server = app.listen(port,()=>{
     console.log(`server listening on http://localhost:${port}` );
 
 })
+
+setupSocket(server);
