@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/Authmiddleware.js";
-import { searchContacts } from "../controllers/ContactControllers.js";
+import { getContactsForDMList, searchContacts } from "../controllers/ContactControllers.js";
 
 const contactsRoutes = Router();
 
 contactsRoutes.post("/search", verifyToken, searchContacts);
+contactsRoutes.get("/get-contacts-for-dm", verifyToken, getContactsForDMList);
 
 export default contactsRoutes;
