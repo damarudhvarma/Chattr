@@ -6,6 +6,7 @@ import mongoose, { set } from  "mongoose";
 import authRoutes from "./routes/AuthRoutes.js";
 import contactsRoutes from "./routes/ContactRoutes.js";
 import setupSocket from "./socket.js";
+import messagesRoutes from "./routes/MessagesRoutes.js";
 
 
 dotenv.config();
@@ -27,6 +28,7 @@ const databaseURI= process.env.DATABASE_URI;
 
 app.use('/api/auth',authRoutes);
 app.use('/api/contacts',contactsRoutes);
+app.use('/api/messages',messagesRoutes);
 
 
 mongoose.set('strictQuery', true)
