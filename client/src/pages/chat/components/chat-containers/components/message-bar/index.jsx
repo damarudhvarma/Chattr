@@ -3,19 +3,22 @@ import { apiClinet } from "@/lib/api-clinet";
 import { useAppStore } from "@/stores";
 import { UPLOAD_FILE_ROUTE } from "@/utils/constants";
 import EmojiPicker from "emoji-picker-react";
-import React, { useState, useRef,useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
 import { RiEmojiStickerLine } from "react-icons/ri";
 
-
-
 const Messagebar = () => {
-
-const Socket = useSocket();
-const fileInputRef = useRef();
-const EmojiRef = useRef();
-const {SelectedChatType,SelectedChatData,userInfo} = useAppStore();
+  const Socket = useSocket();
+  const fileInputRef = useRef();
+  const EmojiRef = useRef();
+  const {
+    SelectedChatType,
+    SelectedChatData,
+    userInfo,
+    setIsUploading,
+    setFileUploadProgress
+  } = useAppStore();
 
   const [Message, setMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -27,32 +30,31 @@ const {SelectedChatType,SelectedChatData,userInfo} = useAppStore();
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-  
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [])
-  
+    };
+  }, []);
 
   const sendMessage = () => {
-if(SelectedChatType==="Contact"){
-  Socket.emit("sendMessage",{
-    sender:userInfo.id,
-    recipient:SelectedChatData._id,
-    content : Message,
-    messageType:"text",
-    fileUrl:"undefined"
-  })
-}
+    if (SelectedChatType === "Contact") {
+      Socket.emit("sendMessage", {
+        sender: userInfo.id,
+        recipient: SelectedChatData._id,
+        content: Message,
+        messageType: "text",
+        fileUrl: "undefined",
+      });
+    }
   };
 
   const handleAttachmentClick = () => {
-    if(fileInputRef.current){
+    if (fileInputRef.current) {
       fileInputRef.current.click();
     }
 
-    console.log("from attachment click")
-  }
+    console.log("from attachment click");
+  };
 
   const handleAttachmentChange = async (e) => {
     try {
@@ -60,10 +62,16 @@ if(SelectedChatType==="Contact"){
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
-  
-        const res = await apiClinet.post(UPLOAD_FILE_ROUTE, formData, { withCredentials: true });
-  
+        setIsUploading(true);
+        const res = await apiClinet.post(UPLOAD_FILE_ROUTE, formData, {
+          withCredentials: true,
+           onUploadProgress: data => {
+            setFileUploadProgress(Math.round((100 * data.loaded) / data.total));
+           }
+        });
+
         if (res.status === 200 && res.data) {
+          setIsUploading(false);
           console.log("File uploaded successfully:", res.data.filePath);
           if (SelectedChatType === "Contact") {
             Socket.emit("sendMessage", {
@@ -79,10 +87,11 @@ if(SelectedChatType==="Contact"){
         console.log("No file selected");
       }
     } catch (error) {
+      setIsUploading(false);
       console.error("Error during file upload:", error);
     }
   };
-  
+
   const handleAddEmoji = (emoji) => {
     setMessage((msg) => msg + emoji.emoji);
   };
@@ -98,12 +107,18 @@ if(SelectedChatType==="Contact"){
           onChange={(e) => setMessage(e.target.value)}
         />
 
-        <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
-        onClick={handleAttachmentClick}
+        <button
+          className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
+          onClick={handleAttachmentClick}
         >
           <GrAttachment className="text-2xl" />
-        </button> 
-        <input type="file" ref={fileInputRef} className="hidden" onChange={handleAttachmentChange} />
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleAttachmentChange}
+        />
         <div className="relative">
           <button
             className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all"
@@ -112,8 +127,12 @@ if(SelectedChatType==="Contact"){
             <RiEmojiStickerLine className="text-2xl" />
           </button>
           <div className=" absolute bottom-16 right-0 " ref={EmojiRef}>
-            <EmojiPicker theme="dark" open={showEmoji} onEmojiClick={handleAddEmoji}
-            autoFocusSearch={false} />
+            <EmojiPicker
+              theme="dark"
+              open={showEmoji}
+              onEmojiClick={handleAddEmoji}
+              autoFocusSearch={false}
+            />
           </div>
         </div>
       </div>
