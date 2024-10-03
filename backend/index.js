@@ -19,7 +19,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads/profiles",express.static("uploads/profiles"));
-
+app.use("/uploads/files",express.static("uploads/files"));
 
 
 const port = process.env.PORT || 3000;
