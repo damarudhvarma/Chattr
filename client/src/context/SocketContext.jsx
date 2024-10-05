@@ -30,15 +30,22 @@ export const SocketProvider = ({children}) => {
        addMessage(message); 
 
     }
+    addContactsInDMContacts(message);
   }
  
   const handleRecieveChannelMessage = (message) => {
     
-       const {SelectedChatData,SelectedChatType,addMessage} = useAppStore.getState();
+       const {SelectedChatData,
+        SelectedChatType,
+        addMessage,
+         addChannelInChannelList,
+         addContactsInDMContacts
+        } = useAppStore.getState();
 
        if(SelectedChatType=== "Channel" && SelectedChatData._id===message.channelId){
           addMessage(message);
         }
+        addChannelInChannelList(message);
 
 
   }
