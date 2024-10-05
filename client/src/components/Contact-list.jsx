@@ -11,11 +11,13 @@ const ContactList = ({ contacts, isChannel = false }) => {
     SelectedChatType,
     SelectedChatData,
     setSelectedChatMessages,
+    channels
   } = useAppStore();
 
   const handleCLick = (contact) => {
     if (isChannel) {
       setSelectedChatType("Channel");
+      setSelectedChatData(contact);
       return;
     } else setSelectedChatType("Contact");
     setSelectedChatData(contact);
