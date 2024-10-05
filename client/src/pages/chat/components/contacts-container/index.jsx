@@ -2,13 +2,13 @@ import { useEffect } from "react";
 import NewDm from "./components/new dm";
 import ProfileInfo from "./components/profile-info";
 import { apiClinet } from "@/lib/api-clinet";
-import { GET_CONTACTS_FOR_DM_ROUTE } from "@/utils/constants";
+import { GET_CONTACTS_FOR_DM_ROUTE, GET_USER_CHANNELS_ROUTE } from "@/utils/constants";
 import ContactList from "@/components/Contact-list";
 import { useAppStore } from "@/stores";
 import CreateChannel from "./components/create-channel";
 const ContactsContainer = () => {
   
-  const {setDirectMessagesContacts,directMessagesContacts} = useAppStore();
+  const {setDirectMessagesContacts,directMessagesContacts,channels,setChannels} = useAppStore();
 
   useEffect(() => {
    const getContacts= async()=>{
@@ -20,7 +20,18 @@ const ContactsContainer = () => {
     }
   
   }
+  const getChannels= async()=>{
+      
+    const res = await apiClinet.get(GET_USER_CHANNELS_ROUTE, { withCredentials: true });
+       
+    if (res.data.channels) {
+      setChannels(res.data.channels);
+    }
+  
+  }
+
  getContacts();
+ getChannels();
   },[]);
 
 
@@ -45,6 +56,10 @@ const ContactsContainer = () => {
         <div className="flex items-center justify-between pr-10 ">
           <Title text="Channels" />
           <CreateChannel/>
+        </div>
+        <div className="max-h-[38vh] overflow-y-auto scrollbar-hidden ">
+          <ContactList contacts={channels} isChannel={true}/>
+
         </div>
       </div>
   <ProfileInfo/>
