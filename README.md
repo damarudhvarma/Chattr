@@ -14,7 +14,7 @@ Chattr is a real-time chatting application built using the **MERN stack** with a
 - **Group Messaging**: Create channels with groups of people for collective communication.
 
 ## Demo
-Visit: [Demo Link](#)
+<!-- Visit: [Demo Link](#)
 
 ### Demo Credentials
 - **User 1**
@@ -22,7 +22,7 @@ Visit: [Demo Link](#)
   - Password: `user123`
 - **User 2**
   - Email: `user2@gmail.com`
-  - Password: `user123`
+  - Password: `user123` -->
 
 ## How to Set Up the Application
 
