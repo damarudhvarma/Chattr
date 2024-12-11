@@ -13,6 +13,8 @@ const PrivateRoute =({children})=>{
  const isAuthenticated =!!userInfo;
  return  isAuthenticated ? children : <Navigate to="/auth" />
 }  
+
+
 const AuthRoute=({children})=>{ 
  const {userInfo}=useAppStore();
  const isAuthenticated =!!userInfo;
