@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import NewDm from "./components/new dm";
 import ProfileInfo from "./components/profile-info";
 import { apiClinet } from "@/lib/api-clinet";
@@ -9,34 +9,36 @@ import CreateChannel from "./components/create-channel";
 const ContactsContainer = () => {
   
   const {setDirectMessagesContacts,directMessagesContacts,channels,setChannels} = useAppStore();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-   const getContacts= async()=>{
-      
-    const res = await apiClinet.get(GET_CONTACTS_FOR_DM_ROUTE, { withCredentials: true });
-       
-    if (res.data.contacts) {
-      setDirectMessagesContacts(res.data.contacts);
-    }
-  
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [contactsRes, channelsRes] = await Promise.all([
+          apiClinet.get(GET_CONTACTS_FOR_DM_ROUTE, { withCredentials: true }),
+          apiClinet.get(GET_USER_CHANNELS_ROUTE, { withCredentials: true })
+        ]);
+
+        if (contactsRes.data.contacts) {
+          setDirectMessagesContacts(contactsRes.data.contacts);
+        }
+        if (channelsRes.data.channels) {
+          setChannels(channelsRes.data.channels);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [setDirectMessagesContacts, setChannels]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
-  const getChannels= async()=>{
-      
-    const res = await apiClinet.get(GET_USER_CHANNELS_ROUTE, { withCredentials: true });
-       
-    if (res.data.channels) {
-      setChannels(res.data.channels);
-    }
-  
-  }
-
- getContacts();
- getChannels();
-  },[]);
-
-
-
-
 
   return (
     <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">

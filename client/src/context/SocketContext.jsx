@@ -12,59 +12,42 @@ export const useSocket = () => {
 
 export const SocketProvider = ({children}) => {
  const socket = useRef();
- const { userInfo, addMessage } = useAppStore();
+ const { userInfo, addMessage, addContactsInDMContacts, addChannelInChannelList } = useAppStore();
 
  
   useEffect(() => {
     if(userInfo){
-      socket.current = io(HOST,{withCredentials:true,
+      socket.current = io(HOST,{
+        withCredentials:true,
         query:{userId:userInfo.id}
       });   
-        socket.current.on("connect",()=>{
-            console.log("connected to socket server");
-        }); 
 
-  const handleRecieveMessage = (message) => {
-    const {SelectedChatData,SelectedChatType} = useAppStore.getState();
-    if(SelectedChatType!==undefined  && (SelectedChatData._id!==message.sender._id || SelectedChatData._id!==message.recipient._id)){
-       addMessage(message); 
+      const handleRecieveMessage = (message) => {
+        const {SelectedChatData, SelectedChatType} = useAppStore.getState();
+        if(SelectedChatType === "Contact" && (SelectedChatData._id === message.sender._id || SelectedChatData._id === message.recipient._id)){
+          addMessage(message);
+        }
+        addContactsInDMContacts(message);
+      }
 
-    }
-    addContactsInDMContacts(message);
-  }
- 
-  const handleRecieveChannelMessage = (message) => {
-    
-       const {SelectedChatData,
-        SelectedChatType,
-        addMessage,
-         addChannelInChannelList,
-         addContactsInDMContacts
-        } = useAppStore.getState();
-
-       if(SelectedChatType=== "Channel" && SelectedChatData._id===message.channelId){
+      const handleRecieveChannelMessage = (message) => {
+        const {SelectedChatData, SelectedChatType} = useAppStore.getState();
+        if(SelectedChatType === "Channel" && SelectedChatData._id === message.channelId){
           addMessage(message);
         }
         addChannelInChannelList(message);
+      }
 
+      socket.current.on("recieveMessage", handleRecieveMessage);
+      socket.current.on("recieve-Channel-Message", handleRecieveChannelMessage);
 
-  }
-
-
-
-
-
-
-
-  socket.current.on("recieveMessage",handleRecieveMessage);
-  socket.current.on("recieve-Channel-Message",handleRecieveChannelMessage);
-
-        return () => {
-            socket.current.disconnect();
-        }
-
+      return () => {
+        socket.current.off("recieveMessage");
+        socket.current.off("recieve-Channel-Message");
+        socket.current.disconnect();
+      }
     }
-  }, [userInfo])
+  }, [userInfo, addMessage, addContactsInDMContacts, addChannelInChannelList]);
 
     return (
         <SocketContext.Provider value={socket.current}>
